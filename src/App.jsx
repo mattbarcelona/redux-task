@@ -1,36 +1,42 @@
-import { useFetchCharacter } from "./hooks/useFecthCharacters";
-import "./App.css";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { addTodo, removeTodo } from "./redux/todosSlice";
 
-function App() {
-  const urlPokemon = "https://pokeapi.co/api/v2/pokemon/1";
-  const urlRick = "https://rickandmortyapi.com/api/character/1";
-  const { character: pokemon, loading: pokemonLoading } =
-    useFetchCharacter(urlPokemon);
-  const { character: rickandmorty, loading: rickandmortyLoading } =
-    useFetchCharacter(urlRick);
+const App = () => {
+  const [inputText, setInputText] = useState("");
+  const dispatch = useDispatch();
+  const todos = useSelector((state) => state.todos);
+
+  const handleAddTodo = () => {
+    if (inputText.trim() !== "") {
+      dispatch(addTodo({ id: Math.random(), text: inputText }));
+      setInputText("");
+    }
+  };
+
+  const handleRemoveTodo = (id) => {
+    dispatch(removeTodo(id));
+  };
 
   return (
-    <>
-      <h2>Pokemon Data</h2>
-      {pokemonLoading ? (
-        <p>Loading...</p>
-      ) : (
-        <div>
-          <h2>{pokemon.name}</h2>
-          <img src={pokemon.sprites.front_default} alt={pokemon.name} />
-        </div>
-      )}
-      <h2>Rick and Morty Data</h2>
-      {rickandmortyLoading ? (
-        <p>Loading...</p>
-      ) : (
-        <div>
-          <h2>{rickandmorty.name}</h2>
-          <img src={rickandmorty.image} alt={rickandmorty.name} />
-        </div>
-      )}
-    </>
+    <div>
+      <h1>Todo List</h1>
+      <input
+        type="text"
+        value={inputText}
+        onChange={(e) => setInputText(e.target.value)}
+      />
+      <button onClick={handleAddTodo}>Add Todo</button>
+      <ul>
+        {todos.map((todo) => (
+          <li key={todo.id}>
+            {todo.text}
+            <button onClick={() => handleRemoveTodo(todo.id)}>Remove</button>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
-}
+};
 
 export default App;
